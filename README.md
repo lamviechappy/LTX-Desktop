@@ -59,8 +59,8 @@ On first launch you may be prompted to review/accept model license terms (licens
 
 Text encoding: to generate videos you must configure text encoding:
 
-- **LTX API key** (cloud text encoding), or
-- **Local Text Encoder** (extra download; enables fully-local operation on supported Windows hardware)
+- **LTX API key** (cloud text encoding) — **text encoding via the API is completely FREE** and highly recommended to speed up inference and save memory. Generate a free API key at the [LTX Console](https://console.ltx.video/). [Read more](https://ltx.io/model/model-blog/ltx-2-better-control-for-real-workflows).
+- **Local Text Encoder** (extra download; enables fully-local operation on supported Windows hardware) — if you don't wish to generate an API key, you can encode text locally via the settings menu.
 
 ## API keys, cost, and privacy
 
@@ -68,13 +68,13 @@ Text encoding: to generate videos you must configure text encoding:
 
 The LTX API is used for:
 
-- API based generations (required on macOS and on unsupported Windows hardware)
-- Cloud text encoding and prompt enhancement
-- Retake
+- **Cloud text encoding and prompt enhancement** — **FREE**; text encoding is highly recommended to speed up inference and save memory
+- API-based video generations (required on macOS and on unsupported Windows hardware) — paid
+- Retake — paid
 
 An LTX API key is required in API-only mode, but optional on Windows local mode if you enable the Local Text Encoder.
 
-Create an API key in the [LTX Console](https://console.ltx.video/api-keys/). API usage is not free.
+Generate a FREE API key at the [LTX Console](https://console.ltx.video/). Text encoding is free; video generation API usage is paid. [Read more](https://ltx.io/model/model-blog/ltx-2-better-control-for-real-workflows).
 
 When you use API-backed features, prompts and media inputs are sent to the API service. Your API key is stored locally in your app data folder — treat it like a secret.
 
