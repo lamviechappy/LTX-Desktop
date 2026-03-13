@@ -270,8 +270,11 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
     await refreshSettings()
   }, [refreshSettings])
 
-  const shouldVideoGenerateWithLtxApi =
-    forceApiGenerations || (settings.userPrefersLtxApiVideoGenerations && settings.hasLtxApiKey)
+  // const shouldVideoGenerateWithLtxApi =
+  //   forceApiGenerations || (settings.userPrefersLtxApiVideoGenerations && settings.hasLtxApiKey)
+
+  // NEW CODE Ép buộc luôn trả về false để dùng Local Model
+  const shouldVideoGenerateWithLtxApi = false; 
 
   const contextValue = useMemo<AppSettingsContextValue>(
     () => ({

@@ -65,10 +65,25 @@ class DistilledNativePipeline:
         from ltx_pipelines.utils.helpers import get_device
         from ltx_pipelines.utils.types import PipelineComponents
 
+        # # OLD CODE
+        # if device is None:
+        #     device = get_device()
+
+        # self.device = device
+        # # END OLD CODE
+
+        # NEW CODE
         if device is None:
-            device = get_device()
+            # Ưu tiên kiểm tra MPS cho Mac M4 trước khi dùng get_device() của thư viện gốc
+            if torch.backends.mps.is_available():
+                device = torch.device("mps")
+                print(f"--- [MAC M4 DETECTED] Force using device: {device} ---")
+            else:
+                device = get_device()
 
         self.device = device
+        # END NEW CODE        
+
         self.dtype = torch.bfloat16
 
         from ltx_core.quantization import QuantizationPolicy

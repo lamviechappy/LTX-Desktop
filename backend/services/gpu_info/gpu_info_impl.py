@@ -87,11 +87,22 @@ class GpuInfoImpl:
 
         return {"name": "Unknown", "vram": 0, "vramUsed": 0}
 
-    def get_cuda_available(self) -> bool:
+    # OLD
+    def get_cuda_available_OLD(self) -> bool:
         try:
             return bool(torch.cuda.is_available())
         except Exception:
             logger.warning("Failed to query CUDA availability", exc_info=True)
+            return False
+    # NEW
+    def get_cuda_available(self) -> bool:
+        try:
+            # Nếu là Mac và có MPS, ta báo là "CUDA available" 
+            # để các Handler cấp cao không chặn tính năng Local
+            if self.get_mps_available():
+                return True
+            return bool(torch.cuda.is_available())
+        except Exception:
             return False
 
     def get_mps_available(self) -> bool:

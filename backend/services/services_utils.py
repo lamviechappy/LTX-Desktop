@@ -59,11 +59,11 @@ def get_device_type(device: str | torch.device | object | None) -> str:
     return "cpu"
 
 
-def device_supports_fp8(device: str | torch.device | object | None) -> bool:
+def device_supports_fp8_OLD(device: str | torch.device | object | None) -> bool:
     return get_device_type(device) == "cuda"
 
 
-def sync_device(device: str | torch.device | object | None) -> None:
+def sync_device_OLD(device: str | torch.device | object | None) -> None:
     device_type = get_device_type(device)
     if device_type == "cuda":
         try:
@@ -77,6 +77,37 @@ def sync_device(device: str | torch.device | object | None) -> None:
             torch.mps.synchronize()
         except Exception:
             logger.warning("torch.mps.synchronize() failed", exc_info=True)
+
+# NEW MODIFY
+def sync_device(device: torch.device | str | None = None) -> None:
+    """Synchronize the specified device (CUDA or MPS)."""
+    if device is None:
+        return
+    
+    # Lấy string type (cuda, mps, cpu)
+    d_type = get_device_type(device)
+    
+    try:
+        if d_type == "cuda":
+            torch.cuda.synchronize(device)
+        elif d_type == "mps":
+            # Thêm dòng này để Mac M4 đồng bộ bộ nhớ chính xác
+            torch.mps.synchronize()
+    except Exception:
+        logger.warning(f"Failed to synchronize device {device}", exc_info=True)
+
+# NEW MODIFY
+def device_supports_fp8(device: torch.device | str | None) -> bool:
+    """Check if the device supports FP8 (Currently only high-end NVIDIA)."""
+    d_type = get_device_type(device)
+    if d_type == "cuda":
+        try:
+            # Chỉ card NVIDIA kiến trúc 8.9 trở lên (40-series) mới hỗ trợ tốt
+            return torch.cuda.get_device_capability(device)[0] >= 9
+        except Exception:
+            return False
+    # Mac M4 (MPS) chưa hỗ trợ kiểu dữ liệu FP8 này qua Torch, nên để False
+    return False
 
 
 def empty_device_cache(device: str | torch.device | object | None) -> None:

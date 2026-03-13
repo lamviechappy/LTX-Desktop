@@ -610,8 +610,7 @@ function PromptBar({
                       { value: 'pro', label: 'LTX-2.3 Pro (API)' },
                     ]
                   : [
-                      { value: 'fast', label: 'LTX-2.3 Fast (Local)' },
-                      { value: 'pro', label: 'LTX-2.3 Pro (Local)' },
+                      { value: 'fast', label: 'LTX 2.3 Fast' },
                     ]
               }
               trigger={
@@ -620,7 +619,7 @@ function PromptBar({
                   <span className="text-zinc-300 font-medium">
                     {shouldVideoGenerateWithLtxApi
                       ? (settings.model === 'pro' ? 'LTX-2.3 Pro (API)' : 'LTX-2.3 Fast (API)')
-                      : (settings.model === 'pro' ? 'LTX-2.3 Pro (Local)' : 'LTX-2.3 Fast (Local)')}
+                      : 'LTX 2.3 Fast'}
                   </span>
                 </>
               }

@@ -126,7 +126,8 @@ export function LaunchGate({
         }
 
         // TODO: Get actual available space
-        setAvailableSpace('1.8 TB')
+        // setAvailableSpace('1.8 TB')
+        setAvailableSpace('60 GB')
       } catch (e) {
         logger.error(`Init error: ${e}`)
       }

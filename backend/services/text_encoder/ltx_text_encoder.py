@@ -45,7 +45,7 @@ class LTXTextEncoder:
             original_text_encoder = ModelLedger.text_encoder
             original_cleanup_memory = ltx_utils.cleanup_memory
 
-            def _quantize_linear_weights_fp8(module: object) -> None:
+            def _quantize_linear_weights_fp8_OLD(module: object) -> None:
                 """Cast all Linear weights to float8_e4m3fn and patch forward to upcast."""
                 for child in module.modules():  # type: ignore[union-attr]
                     if not isinstance(child, torch.nn.Linear):
@@ -63,6 +63,35 @@ class LTXTextEncoder:
 
                     child.forward = _make_upcast_forward(child)  # type: ignore[assignment]
 
+            # NEW CODE
+            def _quantize_linear_weights_fp8(module: object) -> None:
+                """Cast all Linear weights to float8_e4m3fn and patch forward to upcast.
+                Falls back to bfloat16 on MPS (Apple Silicon) which does not support FP8.
+                """
+                use_fp8 = self.device.type != "mps"
+                for child in module.modules():  # type: ignore[union-attr]
+                    if not isinstance(child, torch.nn.Linear):
+                        continue
+                    if use_fp8:
+                        child.weight.data = child.weight.data.to(torch.float8_e4m3fn)
+                        if child.bias is not None:  # pyright: ignore[reportUnnecessaryComparison]
+                            child.bias.data = child.bias.data.to(torch.float8_e4m3fn)
+
+                        def _make_upcast_forward(lin: torch.nn.Linear) -> Callable[..., torch.Tensor]:
+                            def _fwd(x: torch.Tensor, **kw: object) -> torch.Tensor:
+                                w = lin.weight.to(x.dtype)
+                                b = lin.bias.to(x.dtype) if lin.bias is not None else None  # pyright: ignore[reportUnnecessaryComparison]
+                                return torch.nn.functional.linear(x, w, b)
+                            return _fwd
+
+                        child.forward = _make_upcast_forward(child)  # type: ignore[assignment]
+                    else:
+                        # MPS does not support FP8 — use bfloat16 to save memory instead
+                        child.weight.data = child.weight.data.to(torch.bfloat16)
+                        if child.bias is not None:  # pyright: ignore[reportUnnecessaryComparison]
+                            child.bias.data = child.bias.data.to(torch.bfloat16)
+            # END NEW CODE
+            
             def patched_text_encoder(self_model_ledger: ModelLedger) -> object:
                 state = state_getter()
                 te_state = state.text_encoder
